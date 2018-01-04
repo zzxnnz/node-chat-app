@@ -3,9 +3,7 @@ const http = require("http");
 const express = require("express");
 const socketIO = require("socket.io");
 
-const {geoPosition} = require("./utils/geoPosition");
-
-const {generateMessage} = require("./utils/message");
+const {generateMessage, generateLocationMessage} = require("./utils/message");
 
 const publicPath = path.join(__dirname, "/../public");
 const port = process.env.PORT || 3000;
@@ -30,9 +28,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("createLocationMessage", (position) => {
-        geoPosition(position, (err, address) => {
-            socket.broadcast.emit("newMessage", generateMessage("Admin", `One User's address is ${address}`));
-        })
+        io.emit("newLocationMessage", generateLocationMessage("Admin", position.latitude, position.longitude));
     });
 
     socket.on("disconnect", () => {
