@@ -3,6 +3,8 @@ const http = require("http");
 const express = require("express");
 const socketIO = require("socket.io");
 
+const {geoPosition} = require("./utils/geoPosition");
+
 const {generateMessage} = require("./utils/message");
 
 const publicPath = path.join(__dirname, "/../public");
@@ -25,7 +27,13 @@ io.on("connection", (socket) => {
         console.log(message);
         io.emit("newMessage", generateMessage(message.from, message.text));
         callback("From server");
-    })
+    });
+
+    socket.on("createLocationMessage", (position) => {
+        geoPosition(position, (err, address) => {
+            socket.broadcast.emit("newMessage", generateMessage("Admin", `One User's address is ${address}`));
+        })
+    });
 
     socket.on("disconnect", () => {
         console.log("User has been disconnected");
