@@ -15,11 +15,9 @@ app.use(express.static(publicPath));
 
 
 io.on("connection", (socket) => {
-    console.log("New user connected");
+    socket.emit("newMessage", generateMessage("Администратор", "Добро пожаловать!"));
 
-    socket.emit("newMessage", generateMessage("Admin", "Welcome to the chat app!"));
-
-    socket.broadcast.emit("newMessage", generateMessage("Admin", "New User joined!"));
+    socket.broadcast.emit("newMessage", generateMessage("Администратор", "Новый пользователь подключился!"));
 
     socket.on("createMessage", (message, callback) => {
         console.log(message);
@@ -28,12 +26,12 @@ io.on("connection", (socket) => {
     });
 
     socket.on("createLocationMessage", (position, callback) => {
-        io.emit("newLocationMessage", generateLocationMessage("Admin", position.latitude, position.longitude));
+        io.emit("newLocationMessage", generateLocationMessage("Пользователь", position.latitude, position.longitude));
         callback();
     });
 
     socket.on("disconnect", () => {
-        console.log("User has been disconnected");
+        socket.broadcast.emit("newMessage", generateMessage("Администратор", "Пользователь отключился"))
     });
 });
 
