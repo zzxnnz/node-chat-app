@@ -33,12 +33,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on("createMessage", (message, callback) => {
-        io.emit("newMessage", generateMessage(message.from, message.text));
+        var user = users.getUser(socket.id);
+        io.to(user.room).emit("newMessage", generateMessage(user.name, message.text));
         callback();
     });
 
     socket.on("createLocationMessage", (position, callback) => {
-        io.emit("newLocationMessage", generateLocationMessage("Пользователь", position.latitude, position.longitude));
+        var user = users.getUser(socket.id);
+        io.to(user.room).emit("newLocationMessage", generateLocationMessage(user.name, position.latitude, position.longitude));
         callback();
     });
 
